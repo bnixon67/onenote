@@ -5,16 +5,16 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"golang.org/x/oauth2"
 	"github.com/bnixon67/onenote"
-//	"io/ioutil"
+	"golang.org/x/oauth2"
+	//	"io/ioutil"
+	"html/template"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
 	"runtime"
-	"html/template"
 )
 
 const (
@@ -32,7 +32,7 @@ type appVars struct {
 	client   *http.Client
 	state    string
 	authChan chan bool
-	token *oauth2.Token
+	token    *oauth2.Token
 }
 
 func (app *appVars) login(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,7 @@ func (app *appVars) login(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Title string
-		Url string
+		Url   string
 	}{}
 
 	data.Title = "OneNote login"
@@ -88,7 +88,7 @@ func (app *appVars) listNotebooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Title string
+		Title     string
 		Notebooks []string
 	}{}
 
@@ -96,7 +96,7 @@ func (app *appVars) listNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	var query url.Values
 	var nextLink *url.URL
-	
+
 	// list of notebooks may be returned by multiple queries
 	// @odata.nextLink has the link to next set of pages
 	for {
@@ -130,7 +130,6 @@ func (app *appVars) listNotebooks(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-
 
 	err = t.Execute(w, data)
 	if err != nil {
@@ -167,14 +166,14 @@ func (app *appVars) listPages(w http.ResponseWriter, r *http.Request) {
 
 	var query url.Values
 	var nextLink *url.URL
-	
+
 	log.Printf("*** before for listPages ***")
 
 	// list of page may be returned by multiple queries
 	// @odata.nextLink has the link to next set of pages
 	for {
 
-	log.Printf("*** for listPages ***")
+		log.Printf("*** for listPages ***")
 
 		// ----- List Pages
 
@@ -219,7 +218,6 @@ func (app *appVars) listPages(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-
 
 	err = t.Execute(w, data)
 	if err != nil {
@@ -274,7 +272,7 @@ func (app *appVars) oauthRedirect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Title string
+		Title   string
 		BaseUrl string
 	}{}
 
@@ -306,7 +304,6 @@ func randomToken(n int) string {
 
 // main authorizes via OAuth2 with Microsoft
 // two environmental variables must be set (MSCLIENTID and MSCLIENTSECRET)
-// token is written to token.txt file in the current directory
 func main() {
 
 	app := &appVars{}
